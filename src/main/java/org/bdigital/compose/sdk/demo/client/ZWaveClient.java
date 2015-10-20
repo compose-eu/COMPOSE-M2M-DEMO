@@ -21,7 +21,14 @@ import org.springframework.web.client.RestTemplate;
 
 public class ZWaveClient {
 
-    private final String ZWAVE_HOST = "http://raspberrypi.local:8083";
+    private String host;
+    
+    public ZWaveClient(String host) {
+	super();
+	this.host = host;
+    }
+
+    //private final String ZWAVE_HOST = "http://raspberrypi.local:8083";
     private final String ZWAVE_API = "/ZWaveAPI";
     private final String ZWAVE_API_RUN = "/Run";
     private final String ZWAVE_API_RUN_DEVICES = "devices";
@@ -35,7 +42,7 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = ZWAVE_HOST + ZWAVE_API + ZWAVE_API_DATA + "/0";
+	String url = host + ZWAVE_API + ZWAVE_API_DATA + "/0";
 
 	ResponseEntity<ZWaveSensorRegister> response = restTemplate.exchange(url, HttpMethod.GET, request, ZWaveSensorRegister.class);
 
@@ -52,7 +59,7 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = ZWAVE_HOST + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]";
+	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]";
 
 	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
 
@@ -70,7 +77,7 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = ZWAVE_HOST + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + instanceCode + "]" + "."
+	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + instanceCode + "]" + "."
 		+ ZWAVE_API_RUN_COMMANDCLASSES + "[" + "49" + "]";
 
 	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
@@ -97,7 +104,7 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = ZWAVE_HOST + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + sensorCode.getDeviceCode() + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + sensorCode.getInstanceCode()
+	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + sensorCode.getDeviceCode() + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + sensorCode.getInstanceCode()
 		+ "]" + "." + ZWAVE_API_RUN_COMMANDCLASSES + "[" + sensorCode.getCommandClasses() + "]" + "." + ZWAVE_API_RUN_DATA + "[" + sensorCode.getData() + "]";
 
 	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
@@ -119,7 +126,7 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = ZWAVE_HOST + ZWAVE_API + ZWAVE_API_DATA + "/0";
+	String url = host + ZWAVE_API + ZWAVE_API_DATA + "/0";
 
 	ResponseEntity<ZWaveSensorRegister> response = restTemplate.exchange(url, HttpMethod.GET, request, ZWaveSensorRegister.class);
 

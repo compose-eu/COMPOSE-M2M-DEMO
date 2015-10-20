@@ -26,7 +26,7 @@ public class ZWaveClientTest {
     public void testGetDevices() {
 	
 	
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	Set<String> devices = client.getDevices();
 	System.out.println("Devices: " + devices);
@@ -39,7 +39,7 @@ public class ZWaveClientTest {
     public void testGetInstances() {
 	
 	
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	Set<String> instances = client.getIntances("2");
 	System.out.println("Instances: " + instances);
@@ -52,7 +52,7 @@ public class ZWaveClientTest {
     public void testGetDataChannel() {
 	
 	
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	String dchannel = client.getDataChannel("2", "1");
 	System.out.println("DataChannel: " + dchannel);
@@ -64,7 +64,7 @@ public class ZWaveClientTest {
     @Test
     public void testGetData() {
 
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	ResponseEntity<ZWaveSensorRegister> data = client.getAllData();
 	System.out.println(data.getBody());
@@ -77,7 +77,7 @@ public class ZWaveClientTest {
     public void testGetDeviceData() {
 	
 	
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	ZWaveSensorData data = client.getDevicesData(new ZWaveSensorCode("2", "1", "49", "1"));
 	System.out.println("Type: " + data.getType());
@@ -101,7 +101,7 @@ public class ZWaveClientTest {
     @Test
     public void testDiscover() {
 	
-	ZWaveClient client = new ZWaveClient();
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
 	Set<ZWaveSensorCode> sensors = client.discoverSensors("2");
 	

@@ -62,8 +62,8 @@ public class Application {
     }
 
     @Bean
-    public ZWaveClient myZWaveClient() {
-	return new ZWaveClient();
+    public ZWaveClient myZWaveClient(@Value("${gateway.razberry.host}") String host) {
+	return new ZWaveClient(host);
     }
 
     @Bean
