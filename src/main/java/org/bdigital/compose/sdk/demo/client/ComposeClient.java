@@ -7,7 +7,7 @@ import org.bdigital.compose.sdk.client.SDKAPIClient;
 import org.bdigital.compose.sdk.config.ComposeAPICredentials;
 import org.bdigital.compose.sdk.demo.model.ZWaveEverspringCSO;
 import org.bdigital.compose.sdk.exception.HttpErrorException;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeServiceObjectRegistered;
+import org.bdigital.compose.sdk.model.serviceobject.response.ComposeSORegisteredResponse;
 import org.bdigital.compose.sdk.model.user.ComposeUserAccess;
 import org.bdigital.compose.sdk.model.user.ComposeUserAccessToken;
 
@@ -24,12 +24,12 @@ public class ComposeClient {
 	sdkapi = new SDKAPIClient(apiCredentials);
     }
     
-    public ComposeServiceObjectRegistered registerDigi(ZWaveEverspringCSO digiComposeSO) throws HttpErrorException{
+    public ComposeSORegisteredResponse registerDigi(ZWaveEverspringCSO digiComposeSO) throws HttpErrorException{
 	
 	ComposeUserAccess user = new ComposeUserAccess("test_compose_bdigital", "c6jvUBDV");
 	ComposeUserAccessToken token = idmapi.userAuthoritzation(user);
 	
-	ComposeServiceObjectRegistered createdObject = sdkapi.createServiceObjectSDK(token, digiComposeSO);
+	ComposeSORegisteredResponse createdObject = sdkapi.createServiceObjectSDK(token, digiComposeSO);
 	
 	return createdObject;
 	

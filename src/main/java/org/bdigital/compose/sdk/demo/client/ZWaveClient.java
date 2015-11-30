@@ -47,10 +47,19 @@ public class ZWaveClient {
 	ResponseEntity<ZWaveSensorRegister> response = restTemplate.exchange(url, HttpMethod.GET, request, ZWaveSensorRegister.class);
 
 	ZWaveSensorRegister body = response.getBody();
+	
+	Set<String> devicesKeys = new HashSet<String>(0);
+	
+	HashMap<String, HashMap<String, HashMap<String, Object>>> devices = body.getDevices();
+	for (String id : devices.keySet()) {
+	    HashMap<String, String> type = (HashMap<String, String>) devices.get(id).get("data").get("deviceTypeString");
+	    if(type.get("value").contains("Sensor")){
+		devicesKeys.add(id);
+	    }
+	    
+	}
 
-	Set<String> devices = body.getDevices().keySet();
-	devices.remove("1");
-	return devices;
+	return devicesKeys;
 
     }
 
@@ -66,7 +75,7 @@ public class ZWaveClient {
 	HashMap<String, HashMap<String, Object>> body = response.getBody();
 
 	Set<String> instances = body.get("instances").keySet();
-	instances.remove("0");
+	//instances.remove("0");
 
 	return instances;
 

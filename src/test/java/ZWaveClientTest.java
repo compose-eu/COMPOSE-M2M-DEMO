@@ -79,7 +79,7 @@ public class ZWaveClientTest {
 	
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 	
-	ZWaveSensorData data = client.getDevicesData(new ZWaveSensorCode("2", "1", "49", "1"));
+	ZWaveSensorData data = client.getDevicesData(new ZWaveSensorCode("2", "0", "49", "1"));
 	System.out.println("Type: " + data.getType());
 	System.out.println("Value: " + data.getValue());
 	System.out.println("Unit: " + data.getUnit());

@@ -3,7 +3,7 @@ import static org.junit.Assert.*;
 import org.bdigital.compose.sdk.demo.client.ComposeClient;
 import org.bdigital.compose.sdk.demo.model.ZWaveEverspringCSO;
 import org.bdigital.compose.sdk.exception.HttpErrorException;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeServiceObjectRegistered;
+import org.bdigital.compose.sdk.model.serviceobject.response.ComposeSORegisteredResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class RegisterZWaveTest {
 	
 	ZWaveEverspringCSO digiObject = new ZWaveEverspringCSO("http://foo.bar");
 	
-	ComposeServiceObjectRegistered result = register.registerDigi(digiObject);
+	ComposeSORegisteredResponse result = register.registerDigi(digiObject);
 	
 	System.out.println("====================================");
 	System.out.println("Result:");

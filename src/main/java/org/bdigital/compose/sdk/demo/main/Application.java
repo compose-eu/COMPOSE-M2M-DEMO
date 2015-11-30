@@ -1,6 +1,5 @@
 package org.bdigital.compose.sdk.demo.main;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -9,16 +8,18 @@ import org.apache.commons.logging.LogFactory;
 import org.bdigital.compose.sdk.client.IDMAPI;
 import org.bdigital.compose.sdk.client.IDMAPIClient;
 import org.bdigital.compose.sdk.client.SDKAPIClient;
+import org.bdigital.compose.sdk.client.ServioticyAPI;
+import org.bdigital.compose.sdk.client.ServioticyAPIClient;
 import org.bdigital.compose.sdk.config.ComposeAPICredentials;
 import org.bdigital.compose.sdk.demo.client.ZWaveClient;
 import org.bdigital.compose.sdk.demo.model.ZWaveEverspringCSO;
 import org.bdigital.compose.sdk.demo.model.ZWaveSensorCode;
 import org.bdigital.compose.sdk.demo.model.ZWaveSensorData;
 import org.bdigital.compose.sdk.exception.HttpErrorException;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeAbstractSOChannel;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeAbstractSOChannels;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeServiceObjectRegistered;
-import org.bdigital.compose.sdk.model.stream.ComposeUploadStreamData;
+import org.bdigital.compose.sdk.model.serviceobject.components.ComposeAbstractSOChannel;
+import org.bdigital.compose.sdk.model.serviceobject.components.ComposeAbstractSOChannels;
+import org.bdigital.compose.sdk.model.serviceobject.components.ComposeStreamDataUpdate;
+import org.bdigital.compose.sdk.model.serviceobject.response.ComposeSORegisteredResponse;
 import org.bdigital.compose.sdk.model.user.ComposeUserAccess;
 import org.bdigital.compose.sdk.model.user.ComposeUserAccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +42,19 @@ public class Application {
     private static Log logger = LogFactory.getLog(Application.class);
 
     @Autowired
+    private ComposeAPICredentials apiCredentials; 
+    
+    @Autowired
     private ZWaveClient myZWaveClient;
 
     @Autowired
-    private SDKAPIClient sdkapiClient;
+    private ServioticyAPI servioticyAPIClient;
+    
+    @Autowired
+    private SDKAPIClient sdkApiClient;
 
     private ComposeUserAccessToken token;
-    private HashMap<String, ComposeServiceObjectRegistered> devices = new HashMap<String, ComposeServiceObjectRegistered>();
+    private HashMap<String, ComposeSORegisteredResponse> devices = new HashMap<String, ComposeSORegisteredResponse>();
 
     
     public static void main(String[] args) {
@@ -60,18 +67,38 @@ public class Application {
 	System.out.println("--> Looking for Devices ...");
 	
     }
+    
+    @Bean
+    public ComposeAPICredentials apiCredentials() {
+	return new ComposeAPICredentials();
+    }
 
     @Bean
     public ZWaveClient myZWaveClient(@Value("${gateway.razberry.host}") String host) {
 	return new ZWaveClient(host);
     }
+    
+    @Bean
+    public ServioticyAPI servioticyAPIClient(@Value("${compose.idm.user}") String idmUser, @Value("${compose.idm.password}") String idmPassword) throws HttpErrorException {
 
+	System.out.println("=================================================");
+	System.out.println("--> SETTING UP: Compose ServIoTicy API           ");
+	
+	
+	System.out.println("--> Connecting with IDM ...");
+	
+	this.requestToken(idmUser, idmPassword);
+	
+	ServioticyAPI servioticyAPI = new ServioticyAPIClient(apiCredentials);
+	
+	return servioticyAPI;
+    }
+    
     @Bean
     public SDKAPIClient sdkapiClient(@Value("${compose.idm.user}") String idmUser, @Value("${compose.idm.password}") String idmPassword) throws HttpErrorException {
 
 	System.out.println("=================================================");
-	System.out.println("--> SETTING UP COMPOSE SDK DEMO                  ");
-	
+	System.out.println("--> SETTING UP: Compose SDK API                  ");
 	
 	System.out.println("--> Conecting with IDM ...");
 	
@@ -88,11 +115,11 @@ public class Application {
 	
 	try {
 
-	    ArrayList<String> so = client.listServiceObject(token);
+	    Set<String> so = client.listServiceObjectSDK(token);
 	    System.out.println("--> Removing Existing Service Objects: " +  so);
 	    
 	    for (String idSo : so) {
-		client.removeServiceObject(token, idSo);
+		client.deleteServiceObjectSDK(token, idSo);
 	    }
 
 	} catch (ResourceAccessException | HttpServerErrorException e) {
@@ -126,7 +153,7 @@ public class Application {
 			// Register
 			ZWaveEverspringCSO serviceObject = new ZWaveEverspringCSO("http://raspberry.local");
 			System.out.println("--> Registering Service Object: " + serviceObject);
-			ComposeServiceObjectRegistered registeredDevices = sdkapiClient.createServiceObject(token, serviceObject);
+			ComposeSORegisteredResponse registeredDevices = sdkApiClient.createServiceObjectSDK(token, serviceObject);
 
 			System.out.println("--> ZWaveEverspring SeviceObject Registered: " + registeredDevices);
 			devices.put(id, registeredDevices);
@@ -140,7 +167,7 @@ public class Application {
 	    for (String id : devices.keySet()) {
 
 		Set<ZWaveSensorCode> sensors = myZWaveClient.discoverSensors(id);
-		ComposeServiceObjectRegistered so = devices.get(id);
+		ComposeSORegisteredResponse so = devices.get(id);
 		System.out.println("--> Upload Data for ServiceObject: " + so.getId());
 
 		for (ZWaveSensorCode zWaveSensorCode : sensors) {
@@ -150,23 +177,25 @@ public class Application {
 		    if (sensorData.getType().equals("Temperature")) {
 			ComposeAbstractSOChannels channelsData = new ComposeAbstractSOChannels();
 			channelsData.put("temperature", new ComposeAbstractSOChannel("sensor", sensorData.getValue(), "celcius"));
-			ComposeUploadStreamData data = new ComposeUploadStreamData();
+			ComposeStreamDataUpdate data = new ComposeStreamDataUpdate();
 			data.setChannels(channelsData);
 			data.setLastUpdate(sensorData.getUpdateTime());
 
 			System.out.println("--> Sending Data: " + data);
-			sdkapiClient.uploadDataOnServiceObjectStreams(so.getApi_token(), so.getId(), "temperature", data);
+			String rData = servioticyAPIClient.uploadDataOnServiceObjectStreams(so.getApi_token(), so.getId(), "temperature", data);
+			System.out.println("--> Response Data: " + rData);
 		    }
 
 		    if (sensorData.getType().equals("Humidity")) {
 			ComposeAbstractSOChannels channelsData = new ComposeAbstractSOChannels();
 			channelsData.put("humidity", new ComposeAbstractSOChannel("sensor", sensorData.getValue(), "integer"));
-			ComposeUploadStreamData data = new ComposeUploadStreamData();
+			ComposeStreamDataUpdate data = new ComposeStreamDataUpdate();
 			data.setChannels(channelsData);
 			data.setLastUpdate(sensorData.getUpdateTime());
 
 			System.out.println("--> Sending Data: " + data);
-			sdkapiClient.uploadDataOnServiceObjectStreams(so.getApi_token(), so.getId(), "humidity", data);
+			String rData = servioticyAPIClient.uploadDataOnServiceObjectStreams(so.getApi_token(), so.getId(), "humidity", data);
+			System.out.println("--> Response Data: " + rData);
 		    }
 		    
 		}
@@ -176,7 +205,16 @@ public class Application {
 	} catch (ResourceAccessException e) {
 	    System.out.println("--> [WARN] - Unreachable connection: " + e.getCause());
 	}
-
     }
 
+    private void requestToken(String idmUser, String idmPassword) throws HttpErrorException{
+	
+	// Setting Up Compose Client
+	ComposeAPICredentials apiCredentials = new ComposeAPICredentials();
+	IDMAPI idmapi = new IDMAPIClient(apiCredentials);
+	ComposeUserAccess user = new ComposeUserAccess(idmUser, idmPassword);
+	token = idmapi.userAuthoritzation(user);
+	
+    }
+    
 }

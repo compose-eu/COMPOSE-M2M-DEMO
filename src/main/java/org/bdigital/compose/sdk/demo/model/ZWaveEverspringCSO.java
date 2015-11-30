@@ -3,9 +3,9 @@ package org.bdigital.compose.sdk.demo.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.bdigital.compose.sdk.model.serviceobject.ComposeAbstractSOChannel;
-import org.bdigital.compose.sdk.model.serviceobject.ComposeAbstractSOChannels;
 import org.bdigital.compose.sdk.model.serviceobject.ComposeAbstractServiceObject;
+import org.bdigital.compose.sdk.model.serviceobject.components.ComposeAbstractSOChannel;
+import org.bdigital.compose.sdk.model.serviceobject.components.ComposeAbstractSOChannels;
 
 public class ZWaveEverspringCSO extends ComposeAbstractServiceObject<HashMap<String,String>, ArrayList, ArrayList> {
 
@@ -13,8 +13,8 @@ public class ZWaveEverspringCSO extends ComposeAbstractServiceObject<HashMap<Str
 	super();
 	super.setName("Z-Wave Sensor");
 	super.setDescription("Everspring Multi-Sensor: Temperature, Humidity");
-	super.setPublic_property("true");
-	super.setURL(url);
+	super.setPublic_("true");
+	super.setUrl(url);
 	
 	ComposeAbstractSOChannels channel1 = new ComposeAbstractSOChannels();
 	channel1.put("temperature", new ComposeAbstractSOChannel("number", null, "celcius"));
