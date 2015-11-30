@@ -5,6 +5,8 @@ import java.util.HashMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZWaveSensorRegister {
 
@@ -43,7 +45,18 @@ public class ZWaveSensorRegister {
         this.updateTime = updateTime;
     }
 
-    
+    @Override
+    public String toString() {
+	String json = "";
+	ObjectMapper mapper = new ObjectMapper();
+	try {
+	    json = mapper.writeValueAsString(this);
+	} catch (JsonProcessingException e) {
+	    json = super.toString();
+	}
+
+	return json;
+    }
 
    
 }

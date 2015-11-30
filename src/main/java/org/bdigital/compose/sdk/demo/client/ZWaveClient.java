@@ -22,13 +22,13 @@ import org.springframework.web.client.RestTemplate;
 public class ZWaveClient {
 
     private String host;
-    
+
     public ZWaveClient(String host) {
 	super();
 	this.host = host;
     }
 
-    //private final String ZWAVE_HOST = "http://raspberrypi.local:8083";
+    // private final String ZWAVE_HOST = "http://raspberrypi.local:8083";
     private final String ZWAVE_API = "/ZWaveAPI";
     private final String ZWAVE_API_RUN = "/Run";
     private final String ZWAVE_API_RUN_DEVICES = "devices";
@@ -47,16 +47,15 @@ public class ZWaveClient {
 	ResponseEntity<ZWaveSensorRegister> response = restTemplate.exchange(url, HttpMethod.GET, request, ZWaveSensorRegister.class);
 
 	ZWaveSensorRegister body = response.getBody();
-	
+
 	Set<String> devicesKeys = new HashSet<String>(0);
-	
+
 	HashMap<String, HashMap<String, HashMap<String, Object>>> devices = body.getDevices();
 	for (String id : devices.keySet()) {
 	    HashMap<String, String> type = (HashMap<String, String>) devices.get(id).get("data").get("deviceTypeString");
-	    if(type.get("value").contains("Sensor")){
+	    if (type.get("value").contains("Sensor")) {
 		devicesKeys.add(id);
 	    }
-	    
 	}
 
 	return devicesKeys;
@@ -75,36 +74,66 @@ public class ZWaveClient {
 	HashMap<String, HashMap<String, Object>> body = response.getBody();
 
 	Set<String> instances = body.get("instances").keySet();
-	//instances.remove("0");
 
 	return instances;
 
     }
 
-    public String getDataChannel(String deviceCode, String instanceCode) {
+    public Set<String> getCommandClasses(String deviceCode, String instanceCode) {
+
+	RestTemplate restTemplate = this.getRestTemplate();
+	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
+
+	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + instanceCode + "]";
+	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
+
+	HashMap<String, HashMap<String, HashMap<String, Object>>> body = response.getBody();
+
+	Set<String> commandClassesKeys = new HashSet<String>(0);
+	if (body == null) {
+	    return commandClassesKeys;
+	}
+
+	HashMap<String, HashMap<String, Object>> commandClasses = body.get("commandClasses");
+
+	for (String id : commandClasses.keySet()) {
+	    HashMap<String, Object> commandClass = commandClasses.get(id);
+	    String name = (String) commandClass.get("name");
+	    if (name.contains("Sensor")) {
+		commandClassesKeys.add(id);
+	    }
+	}
+
+	return commandClassesKeys;
+
+    }
+
+    public Set<String> getDataChannels(String deviceCode, String instanceCode, String channelCode) {
 
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
 	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + deviceCode + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + instanceCode + "]" + "."
-		+ ZWAVE_API_RUN_COMMANDCLASSES + "[" + "49" + "]";
+		+ ZWAVE_API_RUN_COMMANDCLASSES + "[" + channelCode + "]";
 
 	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
 
 	HashMap<String, HashMap<String, Object>> body = response.getBody();
 
+	Set<String> dataChannels = new HashSet<String>(0);
+
 	if (body == null) {
-	    return null;
+	    return dataChannels;
 	}
 
 	Set<Entry<String, Object>> list = body.get("data").entrySet();
 	for (Entry<String, Object> entry : list) {
 	    if (NumberUtils.isNumber(entry.getKey())) {
-		return entry.getKey();
+		dataChannels.add(entry.getKey());
 	    }
 	}
 
-	return null;
+	return dataChannels;
 
     }
 
@@ -113,18 +142,32 @@ public class ZWaveClient {
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
 
-	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + sensorCode.getDeviceCode() + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + sensorCode.getInstanceCode()
-		+ "]" + "." + ZWAVE_API_RUN_COMMANDCLASSES + "[" + sensorCode.getCommandClasses() + "]" + "." + ZWAVE_API_RUN_DATA + "[" + sensorCode.getData() + "]";
+	String url = host + ZWAVE_API + ZWAVE_API_RUN + "/" + ZWAVE_API_RUN_DEVICES + "[" + sensorCode.getDeviceCode() + "]" + "." + ZWAVE_API_RUN_INSTANCES + "[" + sensorCode.getInstanceCode() + "]"
+		+ "." + ZWAVE_API_RUN_COMMANDCLASSES + "[" + sensorCode.getCommandClasses() + "]" + "." + ZWAVE_API_RUN_DATA + "[" + sensorCode.getData() + "]";
 
 	ResponseEntity<HashMap> response = restTemplate.exchange(url, HttpMethod.GET, request, HashMap.class);
 
 	HashMap body = response.getBody();
 	ZWaveSensorData sensor = new ZWaveSensorData();
 
+	// Common parts
 	sensor.setUpdateTime((Number) body.get("updateTime"));
 	sensor.setType(((Map<String, String>) body.get("sensorTypeString")).get("value"));
-	sensor.setUnit(((Map<String, String>) body.get("scaleString")).get("value"));
-	sensor.setValue(((Map<String, Number>) body.get("val")).get("value"));
+
+	// Type of sensor
+	if (body.get("level") != null) {
+	    sensor.setUnit("Boolean");
+	    Boolean value = ((Map<String, Boolean>) body.get("level")).get("value");
+	    if(value){
+		sensor.setValue(1);
+	    }else{
+		sensor.setValue(0);
+	    }
+	    
+	} else if (body.get("val") != null) {
+	    sensor.setUnit(((Map<String, String>) body.get("scaleString")).get("value"));
+	    sensor.setValue(((Map<String, Number>) body.get("val")).get("value"));
+	}
 
 	return sensor;
 
@@ -151,11 +194,17 @@ public class ZWaveClient {
 
 	for (String instanceCode : instances) {
 
-	    String dataChannel = this.getDataChannel(deviceCode, instanceCode);
-	    if (dataChannel != null) {
-		ZWaveSensorCode sensor = new ZWaveSensorCode(deviceCode, instanceCode, "49", dataChannel);
-		sensors.add(sensor);
+	    Set<String> channels = this.getCommandClasses(deviceCode, instanceCode);
+	    for (String channelsCode : channels) {
+
+		Set<String> dataChannels = this.getDataChannels(deviceCode, instanceCode, channelsCode);
+		for (String dataChannel : dataChannels) {
+		    ZWaveSensorCode sensor = new ZWaveSensorCode(deviceCode, instanceCode, channelsCode, dataChannel);
+		    sensors.add(sensor);
+		}
+
 	    }
+
 	}
 
 	return sensors;

@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
-
 public class ZWaveClientTest {
 
     @Before
@@ -24,88 +23,118 @@ public class ZWaveClientTest {
 
     @Test
     public void testGetDevices() {
-	
-	
+
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
+
 	Set<String> devices = client.getDevices();
 	System.out.println("Devices: " + devices);
-	
+
 	Assert.assertNotNull(devices);
-	
+
     }
-    
+
     @Test
     public void testGetInstances() {
-	
-	
+
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
-	Set<String> instances = client.getIntances("2");
-	System.out.println("Instances: " + instances);
-	
-	Assert.assertNotNull(instances);
-	
+
+	Set<String> devices = client.getDevices();
+	for (String id : devices) {
+	    Set<String> instances = client.getIntances(id);
+	    System.out.println("Instances for Device[" + id + "]: " + instances);
+
+	    Assert.assertNotNull(instances);
+	}
+
     }
-    
+
     @Test
-    public void testGetDataChannel() {
-	
-	
+    public void testGetCommandClasses() {
+
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
-	String dchannel = client.getDataChannel("2", "1");
-	System.out.println("DataChannel: " + dchannel);
-	
-	Assert.assertNotNull(dchannel);
-	
+
+	Set<String> devices = client.getDevices();
+	for (String idDevice : devices) {
+	    Set<String> instances = client.getIntances(idDevice);
+	    for (String idInstance : instances) {
+		Set<String> dchannels = client.getCommandClasses(idDevice, idInstance);
+		System.out.println("DataChannels for Device[" + idDevice + "] and Instance[" + idInstance + "]: " + dchannels);
+
+		Assert.assertNotNull(dchannels);
+	    }
+
+	}
+
+    }
+
+    @Test
+    public void testGetDataChannels() {
+
+	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
+
+	Set<String> devices = client.getDevices();
+	for (String idDevice : devices) {
+	    Set<String> instances = client.getIntances(idDevice);
+	    for (String idInstance : instances) {
+		Set<String> dchannels = client.getCommandClasses(idDevice, idInstance);
+		for (String idChannel : dchannels) {
+		    Set<String> dchannel = client.getDataChannels(idDevice, idInstance, idChannel);
+		    System.out.println("DataChannel for Device[" + idDevice + "] and Instance[" + idInstance + "] and Channel[" + idChannel + "]: " + dchannel);
+
+		    Assert.assertNotNull(dchannel);
+		}
+	    }
+	}
+
     }
 
     @Test
     public void testGetData() {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
+
 	ResponseEntity<ZWaveSensorRegister> data = client.getAllData();
 	System.out.println(data.getBody());
-	
+
 	Assert.assertNotNull(data);
-	
+
     }
-    
+
     @Test
     public void testGetDeviceData() {
-	
-	
+
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
-	ZWaveSensorData data = client.getDevicesData(new ZWaveSensorCode("2", "0", "49", "1"));
-	System.out.println("Type: " + data.getType());
-	System.out.println("Value: " + data.getValue());
-	System.out.println("Unit: " + data.getUnit());
-	System.out.println("Time: " + data.getUpdateTime());
-	
-	Assert.assertNotNull(data);
-	
-	
-	data = client.getDevicesData(new ZWaveSensorCode("2", "0", "49", "5"));
-	System.out.println("Type: " + data.getType());
-	System.out.println("Value: " + data.getValue());
-	System.out.println("Unit: " + data.getUnit());
-	System.out.println("Time: " + data.getUpdateTime());
-	
-	Assert.assertNotNull(data);
-	
+
+	Set<String> devices = client.getDevices();
+	for (String idDevice : devices) {
+	    Set<ZWaveSensorCode> sensors = client.discoverSensors(idDevice);
+	    for (ZWaveSensorCode zWaveSensorCode : sensors) {
+		ZWaveSensorData data = client.getDevicesData(zWaveSensorCode);
+		System.out.println("Type: " + data.getType());
+		System.out.println("Value: " + data.getValue());
+		System.out.println("Unit: " + data.getUnit());
+		System.out.println("Time: " + data.getUpdateTime());
+		Assert.assertNotNull(data);
+	    }
+
+	}
+
     }
-    
+
     @Test
     public void testDiscover() {
-	
+
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
-	
-	Set<ZWaveSensorCode> sensors = client.discoverSensors("2");
-	
-	System.out.println("Discover: " + sensors);
+
+	Set<String> devices = client.getDevices();
+	for (String idDevice : devices) {
+
+	    Set<ZWaveSensorCode> sensors = client.discoverSensors(idDevice);
+
+	    System.out.println("Discover: " + sensors);
+	    Assert.assertTrue(sensors.size() > 0);
+
+	}
     }
 
 }
