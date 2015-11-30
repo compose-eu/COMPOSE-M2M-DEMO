@@ -1,10 +1,11 @@
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.bdigital.compose.sdk.demo.client.ZWaveClient;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorCode;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorData;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorRegister;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorCode;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorData;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorRegister;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,7 +27,7 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
+	Map<String, String> devices = client.getDevices();
 	System.out.println("Devices: " + devices);
 
 	Assert.assertNotNull(devices);
@@ -38,8 +39,8 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
-	for (String id : devices) {
+	Map<String, String> devices = client.getDevices();
+	for (String id : devices.keySet()) {
 	    Set<String> instances = client.getIntances(id);
 	    System.out.println("Instances for Device[" + id + "]: " + instances);
 
@@ -53,8 +54,8 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
-	for (String idDevice : devices) {
+	Map<String, String> devices = client.getDevices();
+	for (String idDevice : devices.keySet()) {
 	    Set<String> instances = client.getIntances(idDevice);
 	    for (String idInstance : instances) {
 		Set<String> dchannels = client.getCommandClasses(idDevice, idInstance);
@@ -72,8 +73,8 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
-	for (String idDevice : devices) {
+	Map<String, String> devices = client.getDevices();
+	for (String idDevice : devices.keySet()) {
 	    Set<String> instances = client.getIntances(idDevice);
 	    for (String idInstance : instances) {
 		Set<String> dchannels = client.getCommandClasses(idDevice, idInstance);
@@ -105,8 +106,8 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
-	for (String idDevice : devices) {
+	Map<String, String> devices = client.getDevices();
+	for (String idDevice : devices.keySet()) {
 	    Set<ZWaveSensorCode> sensors = client.discoverSensors(idDevice);
 	    for (ZWaveSensorCode zWaveSensorCode : sensors) {
 		ZWaveSensorData data = client.getDevicesData(zWaveSensorCode);
@@ -126,8 +127,8 @@ public class ZWaveClientTest {
 
 	ZWaveClient client = new ZWaveClient("http://raspberrypi.local:8083");
 
-	Set<String> devices = client.getDevices();
-	for (String idDevice : devices) {
+	Map<String, String> devices = client.getDevices();
+	for (String idDevice : devices.keySet()) {
 
 	    Set<ZWaveSensorCode> sensors = client.discoverSensors(idDevice);
 

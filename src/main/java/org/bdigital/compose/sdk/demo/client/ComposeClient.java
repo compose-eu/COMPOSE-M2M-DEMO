@@ -5,7 +5,7 @@ import org.bdigital.compose.sdk.client.IDMAPIClient;
 import org.bdigital.compose.sdk.client.SDKAPI;
 import org.bdigital.compose.sdk.client.SDKAPIClient;
 import org.bdigital.compose.sdk.config.ComposeAPICredentials;
-import org.bdigital.compose.sdk.demo.model.ZWaveEverspringCSO;
+import org.bdigital.compose.sdk.demo.model.compose.ZWaveEverspringCSO;
 import org.bdigital.compose.sdk.exception.HttpErrorException;
 import org.bdigital.compose.sdk.model.serviceobject.response.ComposeSORegisteredResponse;
 import org.bdigital.compose.sdk.model.user.ComposeUserAccess;

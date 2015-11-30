@@ -1,7 +1,7 @@
 import static org.junit.Assert.*;
 
 import org.bdigital.compose.sdk.demo.client.ComposeClient;
-import org.bdigital.compose.sdk.demo.model.ZWaveEverspringCSO;
+import org.bdigital.compose.sdk.demo.model.compose.ZWaveEverspringCSO;
 import org.bdigital.compose.sdk.exception.HttpErrorException;
 import org.bdigital.compose.sdk.model.serviceobject.response.ComposeSORegisteredResponse;
 import org.junit.After;

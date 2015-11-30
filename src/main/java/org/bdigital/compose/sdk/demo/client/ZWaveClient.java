@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorCode;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorData;
-import org.bdigital.compose.sdk.demo.model.ZWaveSensorRegister;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorCode;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorData;
+import org.bdigital.compose.sdk.demo.model.zwave.ZWaveSensorRegister;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -37,7 +37,7 @@ public class ZWaveClient {
     private final String ZWAVE_API_RUN_DATA = "data";
     private final String ZWAVE_API_DATA = "/Data";
 
-    public Set<String> getDevices() {
+    public Map<String,String> getDevices() {
 
 	RestTemplate restTemplate = this.getRestTemplate();
 	HttpEntity<String> request = new HttpEntity<String>(this.getHeaders());
@@ -48,17 +48,18 @@ public class ZWaveClient {
 
 	ZWaveSensorRegister body = response.getBody();
 
-	Set<String> devicesKeys = new HashSet<String>(0);
+	Map<String,String> devicesMap = new HashMap<String,String>(0);
 
 	HashMap<String, HashMap<String, HashMap<String, Object>>> devices = body.getDevices();
 	for (String id : devices.keySet()) {
 	    HashMap<String, String> type = (HashMap<String, String>) devices.get(id).get("data").get("deviceTypeString");
 	    if (type.get("value").contains("Sensor")) {
-		devicesKeys.add(id);
+		HashMap<String, String> vendor = (HashMap<String, String>) devices.get(id).get("data").get("vendorString");
+		devicesMap.put(id, vendor.get("value"));
 	    }
 	}
-
-	return devicesKeys;
+	
+	return devicesMap;
 
     }
 
@@ -199,6 +200,7 @@ public class ZWaveClient {
 
 		Set<String> dataChannels = this.getDataChannels(deviceCode, instanceCode, channelsCode);
 		for (String dataChannel : dataChannels) {
+		    
 		    ZWaveSensorCode sensor = new ZWaveSensorCode(deviceCode, instanceCode, channelsCode, dataChannel);
 		    sensors.add(sensor);
 		}
