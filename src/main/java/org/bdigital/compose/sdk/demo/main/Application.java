@@ -164,28 +164,28 @@ public class Application {
 
 			    ZWaveSensorData data = myZWaveClient.getDevicesData(zWaveSensorCode);
 
-			    if (data.getType().equals(ZWaveAeonLabsHumidityCSO.TYPE_NAME)) {
+			    if (data.getType().equals(ZWaveAeonLabsHumidityCSO.TYPE_ORIGIN)) {
 				ZWaveAeonLabsHumidityCSO sensorSO = new ZWaveAeonLabsHumidityCSO("http://raspberry.local");
 				System.out.println("--> Registering Service Object: " + sensorSO);
 				ComposeSORegisteredResponse registeredDevices = sdkApiClient.createServiceObjectSDK(token, sensorSO);
 				System.out.println("--> SeviceObject Registered: " + registeredDevices);
-				registeredSO.get(id).put(ZWaveAeonLabsHumidityCSO.TYPE_NAME, registeredDevices);
+				registeredSO.get(id).put(ZWaveAeonLabsHumidityCSO.TYPE_ORIGIN, registeredDevices);
 			    }
 
-			    if (data.getType().equals(ZWaveAeonLabsLuminiscenceCSO.TYPE_NAME)) {
+			    if (data.getType().equals(ZWaveAeonLabsLuminiscenceCSO.TYPE_ORIGIN)) {
 				ZWaveAeonLabsLuminiscenceCSO sensorSO = new ZWaveAeonLabsLuminiscenceCSO("http://raspberry.local");
 				System.out.println("--> Registering Service Object: " + sensorSO);
 				ComposeSORegisteredResponse registeredDevices = sdkApiClient.createServiceObjectSDK(token, sensorSO);
 				System.out.println("--> SeviceObject Registered: " + registeredDevices);
-				registeredSO.get(id).put(ZWaveAeonLabsLuminiscenceCSO.TYPE_NAME, registeredDevices);
+				registeredSO.get(id).put(ZWaveAeonLabsLuminiscenceCSO.TYPE_ORIGIN, registeredDevices);
 			    }
 
-			    if (data.getType().equals(ZWaveAeonLabsTemperatureCSO.TYPE_NAME)) {
+			    if (data.getType().equals(ZWaveAeonLabsTemperatureCSO.TYPE_ORIGIN)) {
 				ZWaveAeonLabsTemperatureCSO sensorSO = new ZWaveAeonLabsTemperatureCSO("http://raspberry.local");
 				System.out.println("--> Registering Service Object: " + sensorSO);
 				ComposeSORegisteredResponse registeredDevices = sdkApiClient.createServiceObjectSDK(token, sensorSO);
 				System.out.println("--> SeviceObject Registered: " + registeredDevices);
-				registeredSO.get(id).put(ZWaveAeonLabsTemperatureCSO.TYPE_NAME, registeredDevices);
+				registeredSO.get(id).put(ZWaveAeonLabsTemperatureCSO.TYPE_ORIGIN, registeredDevices);
 			    }
 			}
 		    }
@@ -203,8 +203,8 @@ public class Application {
 			//System.out.println("--> Upload Data for ServiceObject: " + so.getId());
 
 			ComposeSORegisteredResponse so;
-			if (sensorData.getType().equals(ZWaveAeonLabsTemperatureCSO.TYPE_NAME)) {
-			    so = registeredSOs.get(ZWaveAeonLabsTemperatureCSO.TYPE_NAME);
+			if (sensorData.getType().equals(ZWaveAeonLabsTemperatureCSO.TYPE_ORIGIN)) {
+			    so = registeredSOs.get(ZWaveAeonLabsTemperatureCSO.TYPE_ORIGIN);
 			    ComposeAbstractSOChannels channelsData = new ComposeAbstractSOChannels();
 			    channelsData.put("temperature", new ComposeAbstractSOChannel("sensor", sensorData.getValue(), "celcius"));
 			    ComposeStreamDataUpdate data = new ComposeStreamDataUpdate();
@@ -216,8 +216,8 @@ public class Application {
 			    System.out.println("--> Response Data: " + rData);
 			}
 
-			if (sensorData.getType().equals(ZWaveAeonLabsHumidityCSO.TYPE_NAME)) {
-			    so = registeredSOs.get(ZWaveAeonLabsHumidityCSO.TYPE_NAME);
+			if (sensorData.getType().equals(ZWaveAeonLabsHumidityCSO.TYPE_ORIGIN)) {
+			    so = registeredSOs.get(ZWaveAeonLabsHumidityCSO.TYPE_ORIGIN);
 			    ComposeAbstractSOChannels channelsData = new ComposeAbstractSOChannels();
 			    channelsData.put("humidity", new ComposeAbstractSOChannel("sensor", sensorData.getValue(), "integer"));
 			    ComposeStreamDataUpdate data = new ComposeStreamDataUpdate();
@@ -229,8 +229,8 @@ public class Application {
 			    System.out.println("--> Response Data: " + rData);
 			}
 
-			if (sensorData.getType().equals(ZWaveAeonLabsLuminiscenceCSO.TYPE_NAME)) {
-			    so = registeredSOs.get(ZWaveAeonLabsLuminiscenceCSO.TYPE_NAME);
+			if (sensorData.getType().equals(ZWaveAeonLabsLuminiscenceCSO.TYPE_ORIGIN)) {
+			    so = registeredSOs.get(ZWaveAeonLabsLuminiscenceCSO.TYPE_ORIGIN);
 			    ComposeAbstractSOChannels channelsData = new ComposeAbstractSOChannels();
 			    channelsData.put("luminiscence", new ComposeAbstractSOChannel("sensor", sensorData.getValue(), "lux"));
 			    ComposeStreamDataUpdate data = new ComposeStreamDataUpdate();
