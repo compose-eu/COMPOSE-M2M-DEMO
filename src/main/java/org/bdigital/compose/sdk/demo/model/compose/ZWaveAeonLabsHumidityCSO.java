@@ -19,7 +19,7 @@ public class ZWaveAeonLabsHumidityCSO extends ZWaveAeonLabsCSO {
 	channel.put(TYPE_COMPOSE, new ComposeAbstractSOChannel("number", null, "integer"));
 	super.addStream(TYPE_COMPOSE, "sensor", super.VENDOR_NAME + " " + TYPE_ORIGIN, channel);
 	
-	//super.setiServeData(TYPE_COMPOSE, "http://iserve.kmi.open.ac.uk/ns/mso#AbsoluteHumiditySensor", "http://iserve.kmi.open.ac.uk/ns/mso#AbsoluteHumidityMeasurement");
+	super.setiServeData(TYPE_COMPOSE, "http://iserve.kmi.open.ac.uk/ns/mso#AbsoluteHumiditySensor", "http://iserve.kmi.open.ac.uk/ns/mso#AbsoluteHumidityMeasurement");
 	
     }
     

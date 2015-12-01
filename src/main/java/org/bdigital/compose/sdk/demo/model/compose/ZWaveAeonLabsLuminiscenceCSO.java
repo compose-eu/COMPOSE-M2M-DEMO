@@ -19,7 +19,7 @@ public class ZWaveAeonLabsLuminiscenceCSO extends ZWaveAeonLabsCSO {
 	channel.put(TYPE_COMPOSE, new ComposeAbstractSOChannel("number", null, "integer"));
 	super.addStream(TYPE_COMPOSE, "sensor", super.VENDOR_NAME+ " " + TYPE_ORIGIN, channel);
 	
-	//super.setiServeData(TYPE_COMPOSE, "http://iserve.kmi.open.ac.uk/ns/mso#IlluminanceSensor", "http://iserve.kmi.open.ac.uk/ns/mso#IlluminanceMeasurement");
+	super.setiServeData(TYPE_COMPOSE, "http://iserve.kmi.open.ac.uk/ns/mso#IlluminanceSensor", "http://iserve.kmi.open.ac.uk/ns/mso#IlluminanceMeasurement");
 	
     }
     
